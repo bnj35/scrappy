@@ -67,7 +67,7 @@ onUnmounted(() => {
     <div v-if="scrapingStatus === 'started'">
       <p>le Scraping a commencé.</p>
     </div>
-    <div v-if="scrapingStatus === 'in_progress'">
+    <div v-if="scrapingStatus === 'in_progress' || scrapingStatus === 'already_in_progress'" >
       <p>Scraping en cours... Veuillez patienter.</p>
     </div>
     <div v-if="scrapingStatus === 'completed'">
@@ -109,6 +109,7 @@ h2 {
 }
 
 main {
+  padding: 2em;
   background-color: #f9f9f9;
   width: 100%;
   min-height: 100vh;

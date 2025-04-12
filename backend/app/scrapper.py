@@ -1,11 +1,12 @@
 import random
 from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
 
 # Limite le nombre de pages à scrapper pour chaque site
-MAX_PAGES = 2
+MAX_PAGES = 10
 # Limite le temps d'attente par défaut pour les sélecteurs
 DEFAULT_TIMEOUT = 5000  # Increase timeout to 10 seconds to handle slow pages
-INDEED_TIMEOUT = 10000  # Increase timeout for Indeed to 10 seconds
+INDEED_TIMEOUT = 2000  # Increase timeout for Indeed to 10 seconds
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 #@@@@@         HELLO WORK       @@@@#
@@ -127,23 +128,34 @@ def scrape_indeed_links():
         base_url = "https://fr.indeed.com/jobs?q=developpeur+web&l=Bordeaux+%2833%29&radius=25&start=%7B%7D&vjk=dff2ff50493c0214"
         all_offers = []
 
+        # Launch Playwright and set up the browser context
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+            browser = p.chromium.launch(headless=True) 
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            )
+            page = context.new_page()
+
+            # Stealth function to avoid detection (Ensure this is defined properly)
+            stealth_sync(page)  # Make sure this is defined to bypass anti-bot measures
 
             for page_number in range(1, MAX_PAGES + 1):
                 url = base_url.format(page_number)
                 print(f"Scraping Indeed page: {url}")
                 page.goto(url)
-                page.wait_for_timeout(random.randint(1500, 3000))
+                page.wait_for_timeout(random.uniform(2000, 5000))  # Random delay
 
                 try:
                     # Wait for the job list to load
-                    page.wait_for_selector('ul.jobsearch-ResultsList', timeout=DEFAULT_TIMEOUT)
+                    page.wait_for_selector('#mosaic-jobResults', timeout=INDEED_TIMEOUT)
 
-                    # Fetch all offers using the new selector structure
+                    # Simulate scrolling to load all jobs on the page
+                    page.mouse.wheel(0, 1000)
+                    page.wait_for_timeout(random.uniform(1000, 2000))  # Add a slight delay after scrolling
+
+                    # Fetch all offers using the correct selector structure
                     offers = page.eval_on_selector_all(
-                        'li.css-1ac2h1w',  # This is the list item class
+                        'li.css-1ac2h1w eu4oa1w0',  # This is the list item class for each job
                         """
                         items => items.map(item => {
                             const title = item.querySelector('.jobTitle a')?.textContent.trim();
@@ -157,7 +169,7 @@ def scrape_indeed_links():
                         """
                     )
 
-                    # If no offers found, break the loop
+                    # If no offers found, continue to next page
                     if not offers:
                         print("No job offers found on this page.")
                         continue
@@ -165,7 +177,7 @@ def scrape_indeed_links():
                     all_offers.extend(offers)
 
                 except Exception as e:
-                    print(f"Error while scraping Indeed page {page_number}: {e}")
+                    print(f"Error while scraping Indeed page {page_number // 10 + 1}: {e}")
                     continue
 
             browser.close()
@@ -179,7 +191,6 @@ def scrape_indeed_links():
     except Exception as e:
         print(f"Erreur dans scrape_indeed_links: {e}")
         return []
-
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ #
 #@@@@@     FRANCE TRAVAIL       @@@@#
@@ -248,44 +259,20 @@ def scrape_france_travail_links():
 
 if __name__ == "__main__":
     offers = scrape_hellowork_links()
-    for offer in offers:
-        print(f"**Titre**: {offer['title']}")
-        print(f"**Entreprise**: {offer['company']}")
-        print(f"**Lieu**: {offer['location']}")
-        print(f"**Contrat**: {offer['contract']}")
-        print(f"**Durée**: {offer['duration']}")
-        print(f"**Lien vers l'offre**: {offer['offer_url']}")
-        print("-" * 40)
 
     print("\n#### WELCOME TO THE JUNGLE ####")
     offers = scrape_wttj_links()
-    for offer in offers:
-        print(f"**Titre**: {offer['title']}")
-        print(f"**Entreprise**: {offer['company']}")
-        print(f"**Lieu**: {offer['location']}")
-        print(f"**Contrat**: {offer['contract']}")
-        print(f"**Date de publication**: {offer['date']}")
-        print(f"**Lien vers l'offre**: {offer['offer_url']}")
-        print("-" * 40)
 
-    print("\n#### INDEED ####")
+    # print("\n#### INDEED ####")
     offers = scrape_indeed_links()
-    for offer in offers:
-        print(f"**Titre**: {offer['title']}")
-        print(f"**Entreprise**: {offer['company']}")
-        print(f"**Lieu**: {offer['location']}")
-        print(f"**Salaire**: {offer['salary']}")
-        print(f"**Contrat**: {offer['contract']}")
-        print(f"**Lien vers l'offre**: {offer['offer_url']}")
-        print("-" * 40)
+    # for offer in offers:
+    #     print(f"**Titre**: {offer['title']}")
+    #     print(f"**Entreprise**: {offer['company']}")
+    #     print(f"**Lieu**: {offer['location']}")
+    #     print(f"**Salaire**: {offer['salary']}")
+    #     print(f"**Contrat**: {offer['contract']}")
+    #     print(f"**Lien vers l'offre**: {offer['offer_url']}")
+    #     print("-" * 40)
 
     print("\n#### FRANCE TRAVAIL ####")
     offers = scrape_france_travail_links()
-    for offer in offers:
-        print(f"**Titre**: {offer['title']}")
-        print(f"**Entreprise**: {offer['company']}")
-        print(f"**Lieu**: {offer['location']}")
-        print(f"**Contrat**: {offer['contract']}")
-        print(f"**Date de publication**: {offer['date']}")
-        print(f"**Lien vers l'offre**: {offer['offer_url']}")
-        print("-" * 40)
