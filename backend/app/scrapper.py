@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 
 # Limite le nombre de pages à scrapper pour chaque site
-MAX_PAGES = 10
+MAX_PAGES = 2
 # Limite le temps d'attente par défaut pour les sélecteurs
 DEFAULT_TIMEOUT = 5000  # Increase timeout to 10 seconds to handle slow pages
 INDEED_TIMEOUT = 2000  # Increase timeout for Indeed to 10 seconds
