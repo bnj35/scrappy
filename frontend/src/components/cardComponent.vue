@@ -1,6 +1,11 @@
 <script setup>
 defineProps({
   title: String,
+  company: String,
+  location: String,
+  contract: String,
+  date: String,
+  duration: String,
   link: String,
 })
 </script>
@@ -8,6 +13,11 @@ defineProps({
 <template>
   <div class="card">
     <h3>{{ title }}</h3>
+    <p><strong>Entreprise:</strong> {{ company }}</p>
+    <p><strong>Lieu:</strong> {{ location }}</p>
+    <p><strong>Contrat:</strong> {{ contract }}</p>
+    <p v-if="duration"><strong>Durée:</strong> {{ duration }}</p>
+    <p v-if="date"><strong>Date de publication:</strong> {{ date }}</p>
     <a :href="link" target="_blank" rel="noopener noreferrer">Voir l'offre</a>
   </div>
 </template>
@@ -23,6 +33,10 @@ defineProps({
 .card h3 {
   margin: 0 0 8px;
   font-size: 18px;
+}
+.card p {
+  margin: 4px 0;
+  font-size: 14px;
 }
 .card a {
   color: #007bff;
