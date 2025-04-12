@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import CardComponent from '../components/cardComponent.vue'
 
 const jobs = ref([])
 
@@ -18,13 +19,16 @@ onMounted(async () => {
 <template>
   <main>
     <h1>Liste des offres d'emploi</h1>
-    <ul>
-      <li v-for="(jobList, source) in jobs" :key="source">
-        <h2>{{ source }}</h2>
-        <ul>
-          <li v-for="job in jobList" :key="job">{{ job }}</li>
-        </ul>
-      </li>
-    </ul>
+    <div v-for="(jobList, source) in jobs" :key="source">
+      <h2>{{ source }}</h2>
+      <div>
+        <CardComponent
+          v-for="job in jobList"
+          :key="job"
+          :title="job"
+          :link="job"
+        />
+      </div>
+    </div>
   </main>
 </template>
