@@ -29,6 +29,13 @@ defineProps({
   padding: 16px;
   margin: 8px 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  min-width: 250px;
+  max-width: 350px;
+  height: 250px;
+  max-height: 300px;
+  min-height: 200px;
+
 }
 .card h3 {
   margin: 0 0 8px;

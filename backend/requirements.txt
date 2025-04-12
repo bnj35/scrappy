@@ -1,4 +1,9 @@
 fastapi
 uvicorn[standard]
+sqlalchemy
+psycopg2-binary
 playwright
 playwright-stealth
+python-dotenv
+typing
+pydantic

@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+
+  db:
+    image: postgres:15
+    container_name: job_scraper_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: job_scraper
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+  adminer:
+    image: adminer
+    container_name: job_scraper_adminer
+    ports:
+      - "8080:8080"
+    
   backend:
     build: ./backend
     container_name: job_scraper_backend
@@ -9,6 +28,8 @@ services:
     working_dir: /app
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/job_scraper
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
@@ -22,3 +43,6 @@ services:
     ports:
       - "5173:5173"
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  db_data:
