@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useJobStore = defineStore('jobStore', () => {
-  const jobs = ref([])
+  const jobs = ref([]);
 
 
   const fetchJobs = async () => {
@@ -46,7 +46,10 @@ export const useJobStore = defineStore('jobStore', () => {
       if (!response.ok) {
         throw new Error('Failed to update jobs in the database');
       }
-  
+      
+      const data = await response.json();
+      jobs.value = data.jobs
+      console.log('Jobs updated in the database:', data);
       await fetchJobs();
     } catch (error) {
       console.error('Error updating jobs:', error);
@@ -64,10 +67,27 @@ export const useJobStore = defineStore('jobStore', () => {
       console.error('Error starting scraping:', error)
     }
   }
+
+  const clearJobs = async () => {
+    try {
+      console.log('Clearing jobs...')
+      const response = await fetch('http://localhost:8000/clear-jobs', {
+        method: 'DELETE',
+      })
+      const data = await response.json()
+      jobs.value = []
+      console.log('Jobs cleared:', data)
+    }
+    catch (error) {
+      console.error('Error clearing jobs:', error)
+    }
+  }
+
   return {
     jobs,
     fetchJobs,
     updateJobsDb,
     startScraping,
+    clearJobs,
   }
 })

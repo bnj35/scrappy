@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.scrapper import scrape_hellowork_links, scrape_wttj_links, scrape_indeed_links, scrape_france_travail_links
+from app.scrapper import scrape_hellowork_links, scrape_wttj_links, scrape_france_travail_links, scrape_linkedin_links
 from sqlalchemy.orm import Session
 from app.db import SessionLocal, Job, Base, engine
 from datetime import datetime
@@ -29,10 +29,11 @@ def scrape_all_jobs():
         job_data = {
             "hellowork": scrape_hellowork_links(),
             "wttj": scrape_wttj_links(),
-            "indeed": scrape_indeed_links(),
-            "france_travail": scrape_france_travail_links()
+            # "indeed": scrape_indeed_links(),
+            "france_travail": scrape_france_travail_links(),
+            "linkedin": scrape_linkedin_links()
         }
-        # Mettre à jour la base de données avec les données scrappées
+        print(job_data)
         db = SessionLocal()
         update_jobs([job for source in job_data.values() for job in source], db)
     except Exception as e:
@@ -42,7 +43,6 @@ def scrape_all_jobs():
 
 @app.get("/scrap-jobs")
 async def get_jobs():
-    # Retourne les données si le scraping est terminé
     if scraping_in_progress:
         return {"status": "in_progress", "jobs": None}
     return {"status": "completed", "jobs": job_data}
@@ -82,7 +82,6 @@ def update_jobs(job_data: List[JobData], db: Session = Depends(get_db)):
         for job in job_data:
             existing_job = db.query(Job).filter(Job.source == job.source, Job.offer_url == job.offer_url).first()
             if existing_job:
-                # Update existing job
                 existing_job.title = job.title
                 existing_job.company = job.company
                 existing_job.location = job.location
@@ -91,7 +90,6 @@ def update_jobs(job_data: List[JobData], db: Session = Depends(get_db)):
                 existing_job.date = job.date
                 existing_job.updated_at = datetime.now()
             else:
-                # Insert new job
                 new_job = Job(
                     source=job.source,
                     title=job.title,
@@ -123,10 +121,21 @@ async def start_scraping(background_tasks: BackgroundTasks, db: Session = Depend
         global scraping_in_progress
         scraping_in_progress = True  # Set scraping status to in progress
         try:
-            scrape_all_jobs()  # Call scrape_all_jobs to perform scraping and update the database
+            scrape_all_jobs() 
         finally:
             scraping_in_progress = False  # Reset scraping status when done
 
     # Start the scraping process in the background
     background_tasks.add_task(scrape_and_update)
     return {"status": "started"}
+
+@app.delete("/clear-jobs")
+def clear_jobs(db: Session = Depends(get_db)):
+    try:
+        db.query(Job).delete()  # Delete all jobs from the database
+        db.commit()  # Commit the changes to the database
+        return {"message": "All jobs cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database clear error: {e}")
+        
+    

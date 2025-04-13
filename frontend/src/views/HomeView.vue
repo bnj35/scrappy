@@ -10,6 +10,16 @@ let fetchInterval = null
 // État pour suivre combien d'annonces afficher par source
 const visibleCounts = ref({})
 
+watch(
+  () => jobStore.jobs,
+  (newJobs) => {
+    if (newJobs.length > 0) {
+      initializeVisibleCounts()
+    }
+  },
+  { immediate: true }
+)
+
 // Fonction pour augmenter le nombre d'annonces visibles pour une source
 const showMore = (source) => {
   if (!visibleCounts.value[source]) {
@@ -29,7 +39,7 @@ const initializeVisibleCounts = () => {
 
 // Computed property pour regrouper les jobs par source
 const jobsBySource = computed(() => {
-  return jobStore.jobs.reduce((acc, job) => {
+    return jobStore.jobs.reduce((acc, job) => {
     if (!acc[job.source]) {
       acc[job.source] = []
     }
@@ -46,9 +56,10 @@ const checkScrapingStatus = async () => {
     scrapingStatus.value = data.status
 
     if (data.status === 'completed') {
-      await jobStore.fetchJobs()
-      initializeVisibleCounts() // Réinitialiser les comptes visibles après le fetch
-      console.log('Jobs fetched successfully:', jobStore.jobs)
+      console.log('Scraping completed:', data.jobs)
+      jobStore.updateJobsDb(data.jobs);
+      await jobStore.fetchJobs() 
+      initializeVisibleCounts() 
     }
   } catch (error) {
     console.error('Error checking scraping status:', error)
@@ -87,6 +98,7 @@ const fetchJobs = async () => {
 }
 
 onMounted(() => {
+
   fetchJobs()
 
   fetchInterval = setInterval(() => {
@@ -113,6 +125,9 @@ onUnmounted(() => {
       </button>
       <button @click="fetchJobs">
         Rafraîchir
+      </button>
+      <button @click="jobStore.clearJobs">
+        Effacer les offres
       </button>
     </div>
 
