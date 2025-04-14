@@ -1,6 +1,10 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.scrapper import scrape_hellowork_links, scrape_wttj_links, scrape_france_travail_links, scrape_linkedin_links
+# from app.scrapper import scrape_hellowork_links, scrape_wttj_links, scrape_france_travail_links, scrape_linkedin_links
+from .scrapper.hellowork import scrape_hellowork_links
+from .scrapper.wttj import scrape_wttj_links
+from .scrapper.france_travail import scrape_france_travail_links
+from .scrapper.linkedin import scrape_linkedin_links
 from sqlalchemy.orm import Session
 from app.db import SessionLocal, Job, Base, engine
 from datetime import datetime
@@ -80,7 +84,7 @@ class JobData(BaseModel):
 def update_jobs(job_data: List[JobData], db: Session = Depends(get_db)):
     try:
         for job in job_data:
-            existing_job = db.query(Job).filter(Job.source == job.source, Job.offer_url == job.offer_url).first()
+            existing_job = db.query(Job).filter(Job.source == job.source, Job.title == job.title, Job.company == job.company).first()
             if existing_job:
                 existing_job.title = job.title
                 existing_job.company = job.company
