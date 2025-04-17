@@ -70,21 +70,23 @@ def scrape_linkedin_links():
                     page.wait_for_selector("li[data-occludable-job-id]", timeout=15000)
 
                     offers = page.eval_on_selector_all(
-                        "li[data-occludable-job-id]",
+                        "li.occludable-update[data-occludable-job-id]",
                         """items => items
                           .map(item => {
+                              // Updated selectors based on the example HTML
                               const linkEl = item.querySelector('a.job-card-list__title--link');
-                              const companyEl = item.querySelector('span.OCTJiTfuvRoNbAplEIjfcyoefuRMlttDng');
-                              const locationEl = item.querySelector('.job-card-container__metadata-wrapper li span');
-
+                              const companyEl = item.querySelector('.artdeco-entity-lockup__subtitle span');
+                              const locationEl = item.querySelector('.job-card-container__metadata-wrapper li');
+                              
                               return {
-                                  title: linkEl?.getAttribute('aria-label')?.trim() || null,
+                                  title: linkEl?.innerText?.trim() || null,
                                   company: companyEl?.innerText?.trim() || null,
                                   location: locationEl?.innerText?.trim() || null,
-                                  offer_url: linkEl?.href?.startsWith('/') ? 'https://www.linkedin.com' + linkEl.href : linkEl?.href || null
+                                  offer_url: linkEl?.href || null,
+                                  source: 'LinkedIn'
                               };
                           })
-                          .filter(job => job.title && job.offer_url)"""  # Filter out invalid jobs
+                          .filter(job => job.title && job.offer_url && job.company)""",
                     )
 
                     if not offers:

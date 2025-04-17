@@ -97,6 +97,23 @@ const fetchJobs = async () => {
   }
 }
 
+const handleGenerateLetter = (data) => {
+  const { company, title, template } = data
+  console.log(`Generating letter for ${company} regarding position: ${title} using template: ${template}`)
+  
+  // Select template based on the template value
+  let letterContent = ''
+  
+  if (template === 'template1') {
+    letterContent = `Lettre de motivation pour ${company} - ${title} (Template 1)`
+  } else {
+    letterContent = `Lettre de motivation pour ${company} - ${title} (Template par défaut)`
+  }
+  
+  // Here you would display/use the letter content
+  alert(letterContent)
+}
+
 onMounted(() => {
 
   fetchJobs()
@@ -148,7 +165,7 @@ onUnmounted(() => {
           <div class="card-grid">
             <CardComponent v-for="(job, index) in jobList.slice(0, visibleCounts[source] || 9)" :key="job.offer_url"
               :title="job.title" :company="job.company" :location="job.location" :contract="job.contract"
-              :date="job.date" :duration="job.duration" :link="job.offer_url" />
+              :date="job.date" :duration="job.duration" :link="job.offer_url" @generateLetter="handleGenerateLetter" />
           </div>
           <button v-if="visibleCounts[source] < jobList.length" @click="showMore(source)">
             Afficher plus

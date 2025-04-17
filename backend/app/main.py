@@ -83,7 +83,14 @@ class JobData(BaseModel):
 @app.post("/jobs")
 def update_jobs(job_data: List[JobData], db: Session = Depends(get_db)):
     try:
+        # Companies to exclude
+        excluded_companies = ["NEXA Digital School", "Studi CFA", "Live Campus"]
+        
         for job in job_data:
+            # Skip jobs from excluded companies
+            if job.company in excluded_companies:
+                continue
+                
             existing_job = db.query(Job).filter(Job.source == job.source, Job.title == job.title, Job.company == job.company).first()
             if existing_job:
                 existing_job.title = job.title

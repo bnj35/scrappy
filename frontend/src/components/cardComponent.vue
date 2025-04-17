@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   title: String,
   company: String,
@@ -8,17 +10,30 @@ defineProps({
   duration: String,
   link: String,
 })
+
+defineEmits(['generateLetter'])
+
+const selectedTemplate = ref('alternance')
+
 </script>
 
 <template>
   <div class="card">
     <h3>{{ title }}</h3>
     <p><strong>Entreprise:</strong> {{ company }}</p>
-    <p><strong>Lieu:</strong> {{ location }}</p>
-    <p><strong>Contrat:</strong> {{ contract }}</p>
+    <p v-if="location"><strong>Lieu:</strong> {{ location }}</p>
+    <p v-if="contract"><strong>Contrat:</strong> {{ contract }}</p>
     <p v-if="duration"><strong>Durée:</strong> {{ duration }}</p>
     <p v-if="date"><strong>Date de publication:</strong> {{ date }}</p>
-    <a :href="link" target="_blank" rel="noopener noreferrer">Voir l'offre</a>
+    <br>
+    <div id="row">
+    <button><a :href="link" target="_blank" rel="noopener noreferrer">Voir l'offre</a></button>
+    <select>
+      <option value="template1">alternance</option>
+      <option value="template2">pas alternance</option>
+    </select>
+    <button @click="$emit('generateLetter', { company, title, template: selectedTemplate})"> générer </button>
+  </div>
   </div>
 </template>
 
@@ -32,8 +47,8 @@ defineProps({
   width: 30%;
   min-width: 250px;
   max-width: 350px;
-  height: 250px;
-  max-height: 300px;
+  max-height: 350px;
+  height: auto;
   min-height: 200px;
 
 }
@@ -44,12 +59,35 @@ defineProps({
 .card p {
   margin: 4px 0;
   font-size: 14px;
+  text-overflow: ellipsis;
 }
 .card a {
-  color: #007bff;
+  color: #ffffff;
   text-decoration: none;
 }
 .card a:hover {
   text-decoration: underline;
+}
+
+.card button {
+  position: relative;
+  bottom: 0;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card button:last-child {
+  background-color: #06d630;
+}
+
+#row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
 }
 </style>
