@@ -34,8 +34,8 @@ def scrape_all_jobs():
             "hellowork": scrape_hellowork_links(),
             "wttj": scrape_wttj_links(),
             # "indeed": scrape_indeed_links(),
-            "france_travail": scrape_france_travail_links(),
-            "linkedin": scrape_linkedin_links()
+            "france_travail": scrape_france_travail_links()
+            # "linkedin": scrape_linkedin_links()
         }
         print(job_data)
         db = SessionLocal()

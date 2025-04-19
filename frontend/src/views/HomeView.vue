@@ -87,9 +87,6 @@ const fetchJobs = async () => {
   try {
     await jobStore.fetchJobs()
     if (jobStore.jobs.length === 0) {
-      const response = await fetch('http://localhost:8000/jobs')
-      const data = await response.json()
-      jobStore.jobs = data.jobs
       console.log('No jobs found, starting scraping...')
       await startScraping()
     } else {
