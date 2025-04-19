@@ -87,6 +87,9 @@ const fetchJobs = async () => {
   try {
     await jobStore.fetchJobs()
     if (jobStore.jobs.length === 0) {
+      const response = await fetch('http://localhost:8000/jobs')
+      const data = await response.json()
+      jobStore.jobs = data.jobs
       console.log('No jobs found, starting scraping...')
       await startScraping()
     } else {
@@ -101,17 +104,125 @@ const handleGenerateLetter = (data) => {
   const { company, title, template } = data
   console.log(`Generating letter for ${company} regarding position: ${title} using template: ${template}`)
   
+  let formatTitle = title.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ')
   // Select template based on the template value
   let letterContent = ''
   
-  if (template === 'template1') {
-    letterContent = `Lettre de motivation pour ${company} - ${title} (Template 1)`
-  } else {
-    letterContent = `Lettre de motivation pour ${company} - ${title} (Template par défaut)`
+  if (template === 'alternance') {
+    letterContent = `
+AUGER Benjamin
+18 rue Victor Lemoine
+54000 Nancy
+07 69 23 05 71
+benjaminauger35@gmail.com
+Portfolio :
+https://bnj.vercel.app/
+https://benjamin-auger-portfolio.vercel.app/
+
+Objet : Candidature - ${formatTitle} - (alternance dans le cadre du Mastère Dev Manager Fullstack de l’EFREI Bordeaux)
+
+Madame, Monsieur,
+
+Actuellement en dernière année de BUT MMI, parcours Développement Web et Multimédia, je suis admis au Mastère Dev Manager Fullstack de l’EFREI Bordeaux pour la rentrée prochaine. 
+Dans ce cadre, je suis à la recherche d’une entreprise pour une alternance me permettant de poursuivre ma montée en compétences tout en contribuant activement à des projets concrets.
+Durant mes études, j’ai eu l’opportunité de développer un socle technique solide en développement web : HTML, CSS, JavaScript, Node.js, PHP, SQL, ainsi que des frameworks comme Next.js, Vue.js et Slim. Je me suis également initié au développement mobile avec Flutter et Dart. Ces compétences, je les ai mises en pratique à travers divers projets universitaires et professionnels, en particulier lors de stages en entreprise.
+
+Parallèlement à mon parcours académique, mon activité de graphiste freelance m’a permis de renforcer mon autonomie, ma rigueur, et mon sens du design.Cette double compétence, technique et créative, me permet d’avoir une vision globale des projets, de la conception à la mise en production.
+
+Intégrer ${company} en alternance serait pour moi l’occasion de continuer à progresser dans un environnement professionnel, tout en apportant mes connaissances, mon enthousiasme et ma curiosité. Je suis particulièrement motivé par les missions de développement web fullstack, l’optimisation des interfaces. De plus j'ai l'habitude du travail en équipe et l’utilisation d’outils collaboratifs comme GitHub, GitLab, Jira ou encore Figma.
+
+Je vous remercie pour votre attention et reste à votre disposition pour toute information complémentaire.
+Je vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.
+
+Benjamin Auger
+    `
+  } else if (template === 'CDD') {
+    letterContent = `
+AUGER Benjamin
+18 rue Victor Lemoine
+54000 Nancy
+07 69 23 05 71
+benjaminauger35@gmail.com
+Portfolio :
+https://bnj.vercel.app/
+https://benjamin-auger-portfolio.vercel.app/
+
+Objet : Candidature - ${formatTitle}
+
+Madame, Monsieur,
+
+Actuellement en dernière année de BUT MMI, parcours Développement Web et Multimédia, je suis admis au Mastère Dev Manager Fullstack de l’EFREI Bordeaux pour la rentrée prochaine. 
+Dans ce cadre, je suis à la recherche d’une entreprise pour une alternance me permettant de poursuivre ma montée en compétences tout en contribuant activement à des projets concrets.
+Durant mes études, j’ai eu l’opportunité de développer un socle technique solide en développement web : HTML, CSS, JavaScript, Node.js, PHP, SQL, ainsi que des frameworks comme Next.js, Vue.js et Slim. Je me suis également initié au développement mobile avec Flutter et Dart. Ces compétences, je les ai mises en pratique à travers divers projets universitaires et professionnels, en particulier lors de stages en entreprise.
+
+Parallèlement à mon parcours académique, mon activité de graphiste freelance m’a permis de renforcer mon autonomie, ma rigueur, et mon sens du design.Cette double compétence, technique et créative, me permet d’avoir une vision globale des projets, de la conception à la mise en production.
+
+Intégrer ${company} en alternance serait pour moi l’occasion de continuer à progresser dans un environnement professionnel, tout en apportant mes connaissances, mon enthousiasme et ma curiosité. Je précise que ma candidature concerne uniquement une alternance dans le cadre de ma formation, et non un contrat à durée déterminée (${template}) comme indiqué dans l’annonce. Je suis particulièrement motivé par les missions de développement web fullstack, l’optimisation des interfaces. De plus j'ai l'habitude du travail en équipe et l’utilisation d’outils collaboratifs comme GitHub, GitLab, Jira ou encore Figma.
+
+Je vous remercie pour votre attention et reste à votre disposition pour toute information complémentaire.
+Je vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.
+
+Benjamin Auger
+    `
   }
+  else if (template === 'CDI') {
+    letterContent = `
+AUGER Benjamin
+18 rue Victor Lemoine
+54000 Nancy
+07 69 23 05 71
+benjaminauger35@gmail.com
+Portfolio :
+https://bnj.vercel.app/
+https://benjamin-auger-portfolio.vercel.app/
+
+Objet : Candidature - ${formatTitle}
+
+Madame, Monsieur,
+
+Actuellement en dernière année de BUT MMI, parcours Développement Web et Multimédia, je suis admis au Mastère Dev Manager Fullstack de l’EFREI Bordeaux pour la rentrée prochaine. 
+Dans ce cadre, je suis à la recherche d’une entreprise pour une alternance me permettant de poursuivre ma montée en compétences tout en contribuant activement à des projets concrets.
+Durant mes études, j’ai eu l’opportunité de développer un socle technique solide en développement web : HTML, CSS, JavaScript, Node.js, PHP, SQL, ainsi que des frameworks comme Next.js, Vue.js et Slim. Je me suis également initié au développement mobile avec Flutter et Dart. Ces compétences, je les ai mises en pratique à travers divers projets universitaires et professionnels, en particulier lors de stages en entreprise.
+
+Parallèlement à mon parcours académique, mon activité de graphiste freelance m’a permis de renforcer mon autonomie, ma rigueur, et mon sens du design.Cette double compétence, technique et créative, me permet d’avoir une vision globale des projets, de la conception à la mise en production.
+
+Intégrer ${company} en alternance serait pour moi l’occasion de continuer à progresser dans un environnement professionnel, tout en apportant mes connaissances, mon enthousiasme et ma curiosité. Je précise que ma candidature concerne uniquement une alternance dans le cadre de ma formation, et non un contrat à durée indétermninée (${template}) comme indiqué dans l’annonce. Je suis particulièrement motivé par les missions de développement web fullstack, l’optimisation des interfaces. De plus j'ai l'habitude du travail en équipe et l’utilisation d’outils collaboratifs comme GitHub, GitLab, Jira ou encore Figma.
+
+Je vous remercie pour votre attention et reste à votre disposition pour toute information complémentaire.
+Je vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.
+
+Benjamin Auger
+    `
+  }
+  // Create a temporary element to generate the PDF
+  const element = document.createElement('div')
+  element.innerHTML = `
+    <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; white-space: pre-wrap; text-align: justify;">
+      ${letterContent}
+    </div>
+  `
+  document.body.appendChild(element)
   
-  // Here you would display/use the letter content
-  alert(letterContent)
+  // Use html2pdf library to generate PDF
+  import('html2pdf.js').then((html2pdf) => {
+    const options = {
+      margin: 1,
+      filename: `lettre_motivation_${company.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
+    }
+    
+    html2pdf.default(element, options).then(() => {
+      // Remove the temporary element after PDF generation
+      document.body.removeChild(element)
+    })
+  }).catch(error => {
+    console.error('Error generating PDF:', error)
+    alert('Erreur lors de la génération du PDF. Veuillez réessayer.')
+    document.body.removeChild(element)
+  })
+  
 }
 
 onMounted(() => {

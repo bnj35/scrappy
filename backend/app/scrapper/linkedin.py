@@ -25,7 +25,7 @@ def stealth_sync(page):
 
 def scrape_linkedin_links():
     try:
-        base_url = "https://www.linkedin.com/jobs/search/?currentJobId=4169994755&distance=25&geoId=104787182&keywords=developpeur%20web&origin=JOBS_HOME_SEARCH_CARDS"
+        base_url = "https://www.linkedin.com/jobs/search/?currentJobId=4169994755&distance=25&geoId=104787182&keywords=developpeur%20web&origin=JOBS_HOME_SEARCH_CARDS&position=3&pageNum=0"
         all_offers = []
 
         with sync_playwright() as p:
@@ -67,26 +67,26 @@ def scrape_linkedin_links():
                         page.wait_for_timeout(random.uniform(1000, 2000))
 
                     # Wait for job cards to load
-                    page.wait_for_selector("li[data-occludable-job-id]", timeout=15000)
+                    page.wait_for_selector("div.base-search-card", timeout=15000)
 
                     offers = page.eval_on_selector_all(
-                        "li.occludable-update[data-occludable-job-id]",
+                        "div.base-search-card",
                         """items => items
                           .map(item => {
-                              // Updated selectors based on the example HTML
-                              const linkEl = item.querySelector('a.job-card-list__title--link');
-                              const companyEl = item.querySelector('.artdeco-entity-lockup__subtitle span');
-                              const locationEl = item.querySelector('.job-card-container__metadata-wrapper li');
-                              
+                              const titleEl = item.querySelector('h3.base-search-card__title');
+                              const companyEl = item.querySelector('h4.base-search-card__subtitle a');
+                              const locationEl = item.querySelector('span.job-search-card__location');
+                              const linkEl = item.querySelector('a.base-card__full-link');
+
                               return {
-                                  title: linkEl?.innerText?.trim() || null,
+                                  title: titleEl?.innerText?.trim() || null,
                                   company: companyEl?.innerText?.trim() || null,
                                   location: locationEl?.innerText?.trim() || null,
                                   offer_url: linkEl?.href || null,
                                   source: 'LinkedIn'
                               };
                           })
-                          .filter(job => job.title && job.offer_url && job.company)""",
+                          .filter(job => job.title && job.offer_url && job.company)"""
                     )
 
                     if not offers:
