@@ -28,9 +28,10 @@ const selectedTemplate = ref('alternance')
     <br>
     <div id="row">
     <button><a :href="link" target="_blank" rel="noopener noreferrer">Voir l'offre</a></button>
-    <select>
-      <option value="template1">alternance</option>
-      <option value="template2">pas alternance</option>
+    <select v-model="selectedTemplate">
+      <option value="alternance">alternance</option>
+      <option value="CDD">CDD</option>
+      <option value="CDI">CDI</option>
     </select>
     <button @click="$emit('generateLetter', { company, title, template: selectedTemplate})"> générer </button>
   </div>
